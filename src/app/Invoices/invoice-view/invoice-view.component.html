@@ -1,0 +1,219 @@
+<div class="nonPrintArea">
+	<mat-card>
+		<div class="grid-container-1">
+			<div class="grid-item-left">
+				<mat-card-title *ngIf="order.clientName">{{order?.clientName}}</mat-card-title>
+				<mat-card-subtitle *ngIf="order.clientAddress">{{order?.clientAddress}}</mat-card-subtitle>
+				<p *ngIf="order.clientGSTIN">Customer GSTIN: {{order?.clientGSTIN}}</p>
+			</div>
+		</div>
+
+		<mat-card-content>
+			<div>
+				<div class="grid-container-1">
+					<div class="grid-item-center">
+						<mat-grid-list cols="4" rowHeight="3:1" class="myheaderStyle">
+							<mat-grid-tile>S.No#</mat-grid-tile>
+							<mat-grid-tile>Products</mat-grid-tile>
+							<!-- <mat-grid-tile>HSN/SAC</mat-grid-tile> -->
+							<mat-grid-tile>Qty</mat-grid-tile>
+							<!-- <mat-grid-tile>Rate/Product</mat-grid-tile> -->
+							<mat-grid-tile>Amount</mat-grid-tile>
+						</mat-grid-list>
+						<mat-grid-list cols="4" rowHeight="30px" *ngFor="let listItem of order?.listOfItems;index as i">
+							<mat-grid-tile>{{i+1}}</mat-grid-tile>
+							<mat-grid-tile>{{listItem.itemName}}</mat-grid-tile>
+							<!-- <mat-grid-tile>{{invoice.HSNcode}}</mat-grid-tile> -->
+							<mat-grid-tile>{{listItem.quantity}}</mat-grid-tile>
+							<!-- <mat-grid-tile *ngIf="order.businessType=='Sell'">{{listItem.itemSellingPrice}}</mat-grid-tile> -->
+							<mat-grid-tile *ngIf="order.businessType=='Sell'">{{listItem.spCost}}</mat-grid-tile>
+						</mat-grid-list>
+					</div>
+				</div>
+
+
+				<div class="grid-container-2">
+					<div class="grid-item-right"></div>
+					<div class="grid-item-right">
+
+						<mat-grid-list cols="2" rowHeight="30px">
+							<mat-grid-tile class="myheaderStyle">Total:</mat-grid-tile>
+							<mat-grid-tile> {{order?.totalCost }}</mat-grid-tile>
+							<mat-grid-tile class="myheaderStyle">SGST:</mat-grid-tile>
+							<mat-grid-tile>{{SGST_Val}}</mat-grid-tile>
+							<mat-grid-tile class="myheaderStyle">CGST:</mat-grid-tile>
+							<mat-grid-tile>{{CGST_Val}}</mat-grid-tile>
+							<mat-grid-tile class="myheaderStyle">IGST:</mat-grid-tile>
+							<mat-grid-tile>{{IGST_Val}}</mat-grid-tile>
+							<mat-grid-tile class="myheaderStyle">G.Total:</mat-grid-tile>
+							<mat-grid-tile>{{getTotalCost()}}</mat-grid-tile>
+							<mat-grid-tile class="myheaderStyle">G. Total (approx):</mat-grid-tile>
+							<mat-grid-tile><strong>&#8377; {{getTotalCostApprox()}}</strong></mat-grid-tile>
+						</mat-grid-list>
+
+					</div>
+				</div>
+
+
+			</div>
+
+
+		</mat-card-content>
+		<mat-card-actions>
+			<div class="grid-container-1" style="margin-top:1px;margin-bottom:1px">
+				<div class="grid-item-left">
+					<button mat-raised-button (click)="print()" color="primary"><mat-icon>print</mat-icon> Print</button>
+					<button mat-raised-button color="accent" (click)="onCancel()">Cancel</button>
+				</div>
+			</div>
+
+		</mat-card-actions>
+	</mat-card>
+
+	<div class="printArea" id="print-section" [hidden]="true">
+		<!-- <mat-grid-list cols="2" rowHeight="20px">
+  <mat-grid-tile>1</mat-grid-tile>
+  <mat-grid-tile >2</mat-grid-tile>
+  <mat-grid-tile>3</mat-grid-tile>
+  <mat-grid-tile>4</mat-grid-tile>
+</mat-grid-list>
+
+
+
+<div class="grid-container">
+  <div class="grid-item">1</div>
+  <div class="grid-item" *ngIf="false">2</div>
+  <div class="grid-item">3</div>  
+  <div class="grid-item">4</div>
+  <div class="grid-item" *ngIf="false">5</div>
+  <div class="grid-item">6</div>  
+  <div class="grid-item">7</div>
+  <div class="grid-item" *ngIf="false">8</div>
+  <div class="grid-item">9</div>  
+</div> -->
+		<div class="mainpage">
+
+			<h1 style="text-align:center;margin-top:20px"><strong>TAX INVOICE</strong></h1>
+			<div class="grid-container-2">
+				<div class="grid-item-left">
+					<p><strong>{{shop.shopName}}</strong> <br>
+						<span *ngFor="let add of shopAddress">
+      {{add}}<br/>
+    </span><br>
+    {{shop.shopPhoneNo}} <br>
+    {{shop.shopEmail}}
+					</p>
+						<P><strong>GSTIN:</strong> {{shop.shopGSTIN}}<br>
+							<strong>State:</strong> Texas</P>
+				</div>
+				<div class="grid-item-right">
+					<!-- <div style="text-align:right!important"> -->
+					<P>
+						{{dateConverter(invoice?.lastUpdatedDate)}}<br>
+						<strong>Invoice No:</strong> {{invoice?.invoiceNo}}</P>
+					<!-- </div> -->
+				</div>
+			</div>
+			<hr class="myheaderStyle">
+			<div class="grid-container-3">
+				<div class="grid-item-left">
+					<p>
+						<strong>Customer Name:</strong><br>{{order?.clientName}}<br><br>
+						<strong>Customer GSTIN:</strong><br>{{order?.clientGSTIN}}
+    </p>
+				</div>
+				<div class="grid-item-left">
+					<p><strong>Billing Address:</strong><br>
+{{order?.clientAddress}}
+</p>
+				</div>
+				<div class="grid-item-left">
+					<p><strong>Shipping Address:</strong><br>
+{{order?.clientAddress}}
+</p>
+				</div>
+			</div>
+			<hr class="myheaderStyle">
+			<div class="grid-container-2">
+
+				<div class="grid-item-left">
+					<p>
+						<strong>E-Way Bill No.</strong> {{invoice?.eWayBillNo}} <br>
+						<strong>Place of Supply:</strong> Texas <br><br>
+						<strong>Vehicle No.</strong> {{invoice?.vehicleNo}} <br>
+						<strong>Transporter Name:</strong> {{invoice?.transporterName}}
+					</p>
+				</div>
+			</div>
+
+			<div class="grid-container-1">
+				<div class="grid-item-center">
+					<div>
+						<table>
+							<tr class="rowStyle myheaderStyle">
+								<th>S.No#</th>
+								<th>Products</th>
+								<th>HSN/SAC</th>
+								<th>Quantity</th>
+								<th>Rate/Product</th>
+								<th>Amount</th>
+							</tr>
+							<tr *ngFor="let listItem of order?.listOfItems;index as i">
+								<td class="rowStyle">{{i+1}}</td>
+								<td class="rowStyle">{{listItem.itemName}}</td>
+								<td class="rowStyle">{{invoice.HSNcode}}</td>
+								<td class="rowStyle">{{listItem.quantity}}</td>
+								<td class="rowStyle" *ngIf="order.businessType=='Sell'">{{listItem.itemSellingPrice}}
+								</td>
+								<td class="rowStyle" *ngIf="order.businessType=='Sell'">{{listItem.spCost}}</td>
+
+							</tr>
+
+
+						</table>
+					</div>
+
+
+				</div>
+			</div>
+
+			<div class="grid-container-4">
+				<div class="grid-item-left"></div>
+				<div class="grid-item-left"></div>
+				<div class="grid-item-left"></div>
+				<div class="grid-item-left">
+					<p><strong>Total: </strong> {{order?.totalCost}}</p>
+					<p><strong> SGST: </strong> {{SGST_Val}}</p>
+					<p><strong> CGST: </strong> {{CGST_Val}}</p>
+					<p><strong> IGST: </strong> {{IGST_Val}}</p>
+					<p><strong> Grand Total: </strong> {{getTotalCost()}}</p>
+					<p><strong> Grand Total (approx): &#8377; </strong> {{getTotalCostApprox()}}</p>
+					<p><strong>Grand Total (in words):</strong> {{numberInWords(getTotalCostApprox())| titlecase}}</p>
+				</div>
+			</div>
+
+			<div class="grid-container-3">
+				<div class="grid-item-left">
+					<div *ngIf="shopConditions.length>0">
+						<p><strong>Terms & conditions:</strong></p>
+						<ul *ngFor="let condition of shopConditions">
+							<li *ngIf="condition.length>0">{{condition}}</li>
+						</ul>
+					</div>
+				</div>
+				<div class="grid-item-right"></div>
+				<div class="grid-item-center">
+
+
+
+					<p><strong>{{shop.shopName}}</strong><br><br><br>Authorised Signatory</p>
+				</div>
+
+			</div>
+		</div>
+
+		<!-- <button mat-raised-button color="primary" (click)="printPage()"> Print</button> -->
+		<!-- Copyright 2020 Google LLC. All Rights Reserved.
+    Use of this source code is governed by an MIT-style license that
+    can be found in the LICENSE file at http://angular.io/license -->
+	</div>
